@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Carrito | Marea Fit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+            <div class="container w-100 d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center">
+                <a class="navbar-brand" th:href="@{/}">
+                    <img th:src="@{/Imagenes/logo_1.png}" alt="Logo Marea" style="height: 60px;">
+                </a>
+                <span sec:authorize="isAuthenticated()" class="ms-2 text-white">
+                    Bienvenido, <span sec:authentication="principal.usuario.nombre">Usuario</span>
+                </span>
+                </div>
+
+                <ul sec:authorize="isAuthenticated()" class="navbar-nav mx-auto">
+                <li class="nav-item"><a class="nav-link text-white" th:href="@{/carta}">Carta</a></li>
+                <li class="nav-item"><a class="nav-link text-white" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+                <li class="nav-item"><a class="nav-link text-white" th:href="@{/carrito}">Carrito</a></li>
+                </ul>
+
+                <ul class="navbar-nav d-flex align-items-center">
+
+                <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/nosotros}">Nosotros</a></li>
+                <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/contacto}">Contacto</a></li>
+                <li sec:authorize="isAuthenticated()" class="nav-item">
+                    <form th:action="@{/logout}" method="post" class="d-inline m-0">
+                    <button type="submit" class="nav-link text-white bg-transparent border-0" style="cursor:pointer;">Cerrar Sesión</button>
+                    </form>
+                </li>
+
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/carta}">Carta</a></li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/nosotros}">Nosotros</a></li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/contacto}">Contacto</a></li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/login}">Ingresar</a></li>
+                <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/register}">Registro</a></li>
+
+                </ul>
+
+            </div>
+            </nav>
+
+            <div class="container py-5">
+
+                <div class="row">
+
+                    <div class="col-md-8">
+
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2 class="fw-bold">
+                                <i class="fas fa-shopping-cart text-success"></i> Mi Carrito
+                            </h2>
+                            <a href="/carta" class="btn btn-outline-success">
+                                <i class="fas fa-arrow-left"></i> Seguir comprando
+                            </a>
+                        </div>
+
+                        <div id="carrito-items"></div>
+
+                    </div>
+
+                    <div class="col-md-4">
+                        <div id="carrito-resumen"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+            <script>
+
+            document.addEventListener("DOMContentLoaded", function () {
+                cargarCarrito();
+            });
+
+            function cargarCarrito() {
+                fetch("/api/carrito")
+                    .then(res => res.json())
+                    .then(carrito => {
+
+                        const contenedor = document.getElementById("carrito-items");
+                        const resumen = document.getElementById("carrito-resumen");
+
+                        contenedor.innerHTML = "";
+                        resumen.innerHTML = "";
+
+                        if (!carrito || carrito.items.length === 0) {
+                            contenedor.innerHTML = `
+                                <div class="text-center py-5">
+                                    <i class="fas fa-shopping-cart fa-4x text-muted mb-4"></i>
+                                    <h4>Tu carrito está vacío</h4>
+                                    <p class="text-muted">Agrega productos para empezar tu pedido</p>
+                                    <a href="/carta" class="btn btn-success mt-3">
+                                        <i class="fas fa-utensils"></i> Ver carta
+                                    </a>
+                                </div>`;
+                            return;
+                        }
+
+                        carrito.items.forEach(item => {
+                            contenedor.innerHTML += crearItemHTML(item);
+                        });
+
+                        resumen.innerHTML = crearResumenHTML(carrito);
+                    });
+            }
+
+            function crearItemHTML(item) {
+                return `
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <div class="row align-items-center">
+
+                                <div class="col-md-2 text-center">
+                                    <img src="${item.producto.imagenUrl}"
+                                        class="img-fluid rounded"
+                                        style="max-height:80px;object-fit:cover"
+                                        onerror="this.src='/Imagenes/default-product.jpg'">
+                                </div>
+
+                                <div class="col-md-4">
+                                    <h6>${item.producto.nombre}</h6>
+                                    <small class="text-muted">${item.producto.nombreCategoria}</small>
+                                    <p class="text-success fw-bold mt-2">
+                                        S/ ${item.producto.precio.toFixed(2)}
+                                    </p>
+                                </div>
+
+                                <div class="col-md-3">
+                                    <label class="small text-muted">Cantidad:</label>
+                                    <input type="number"
+                                        min="1"
+                                        value="${item.cantidad}"
+                                        class="form-control form-control-sm"
+                                        onchange="actualizarCantidad(${item.producto.idProducto}, this.value)">
+                                </div>
+
+                                <div class="col-md-3 text-end">
+                                    <p class="fw-bold">S/ ${item.subtotal.toFixed(2)}</p>
+                                    <button class="btn btn-sm btn-outline-danger"
+                                            onclick="eliminarProducto(${item.producto.idProducto})">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            function crearResumenHTML(carrito) {
+                return `
+                    <div class="card shadow-sm sticky-top" style="top:20px">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0"><i class="fas fa-calculator"></i> Resumen del Pedido</h5>
+                        </div>
+
+                        <div class="card-body">
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Productos:</span>
+                                <strong>${carrito.items.length}</strong>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Total unidades:</span>
+                                <strong>${carrito.totalCantidad}</strong>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Subtotal:</span>
+                                <span>S/ ${carrito.total.toFixed(2)}</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between mb-3">
+                                <span>Delivery:</span>
+                                <span class="text-success">Gratis</span>
+                            </div>
+
+                            <hr>
+
+                            <div class="d-flex justify-content-between mb-4">
+                                <h5>Total:</h5>
+                                <h3 class="text-success">S/ ${carrito.total.toFixed(2)}</h3>
+                            </div>
+
+                            <a href="/checkout" class="btn btn-success w-100 btn-lg">
+                                <i class="fas fa-credit-card"></i> Proceder al Pago
+                            </a>
+
+                            <button class="btn btn-outline-danger w-100 mt-3"
+                                    onclick="vaciarCarrito()">
+                                <i class="fas fa-trash-alt"></i> Vaciar carrito
+                            </button>
+
+                            <a href="/carta" class="btn btn-outline-success w-100 mt-2">
+                                <i class="fas fa-plus"></i> Agregar más productos
+                            </a>
+
+                        </div>
+                    </div>`;
+            }
+
+            function actualizarCantidad(idProducto, cantidad) {
+                fetch(`/api/carrito/actualizar/${idProducto}?cantidad=${cantidad}`, {
+                    method: "PUT"
+                }).then(() => cargarCarrito());
+            }
+
+            function eliminarProducto(idProducto) {
+                if (!confirm("¿Eliminar este producto?")) return;
+
+                fetch(`/api/carrito/eliminar/${idProducto}`, {
+                    method: "DELETE"
+                }).then(() => cargarCarrito());
+            }
+
+            function vaciarCarrito() {
+                if (!confirm("¿Vaciar todo el carrito?")) return;
+
+                fetch(`/api/carrito/vaciar`, {
+                    method: "DELETE"
+                }).then(() => cargarCarrito());
+            }
+
+            </script>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" 
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Marea Fit</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/index.css}">
+</head>
+
+<body>
+
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+        <div class="container w-100 d-flex justify-content-between align-items-center">
+
+          <div class="d-flex align-items-center">
+            <a class="navbar-brand" th:href="@{/}">
+              <img th:src="@{/Imagenes/logo_1.png}" alt="Logo Marea" style="height: 60px;">
+            </a>
+            <span sec:authorize="isAuthenticated()" class="ms-2 text-white">
+              Bienvenido, <span sec:authentication="principal.usuario.nombre">Usuario</span>
+            </span>
+          </div>
+
+          <ul sec:authorize="isAuthenticated()" class="navbar-nav mx-auto">
+            <li class="nav-item"><a class="nav-link text-white" th:href="@{/carta}">Carta</a></li>
+            <li class="nav-item"><a class="nav-link text-white" th:href="@{/mis-pedidos}">Mis Pedidos</a></li>
+            <li class="nav-item"><a class="nav-link text-white" th:href="@{/carrito}">Carrito</a></li>
+          </ul>
+
+          <ul class="navbar-nav d-flex align-items-center">
+
+            <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/nosotros}">Nosotros</a></li>
+            <li sec:authorize="isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/contacto}">Contacto</a></li>
+            <li sec:authorize="isAuthenticated()" class="nav-item">
+              <form th:action="@{/logout}" method="post" class="d-inline m-0">
+                <button type="submit" class="nav-link text-white bg-transparent border-0" style="cursor:pointer;">Cerrar Sesión</button>
+              </form>
+            </li>
+
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/carta}">Carta</a></li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/nosotros}">Nosotros</a></li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/contacto}">Contacto</a></li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/login}">Ingresar</a></li>
+            <li sec:authorize="!isAuthenticated()" class="nav-item"><a class="nav-link text-white" th:href="@{/register}">Registro</a></li>
+
+          </ul>
+
+        </div>
+      </nav>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+      </body>
+      </html>
+
+        <section class="hero container py-5 ">
+          <div class="row align-items-center">
+            <div class="col-md-6">
+              <h1 class="display-5 fw-bold">
+                <span class="text-success">Marea</span><br>
+                Comida <strong>Saludable</strong><br>
+                <span class="text-success">que Nutre tu Vida</span>
+              </h1>
+              <p class="mt-3 fs-5 text-secondary">
+                Descubre sabores frescos y naturales en cada bocado. En Marea creamos platos
+                nutritivos y deliciosos que alimentan tu cuerpo y alma.
+              </p>
+              <div class="mt-4">
+                <a th:href="@{/carta}" class="btn btn-success me-2">Ver Carta</a>
+                <a th:href="@{/pedido}" class="btn btn-outline-success">Hacer Pedido</a>
+              </div>
+            </div>
+            <div class="col-md-6 text-center">
+              <img th:src="@{/Imagenes/lechuga-fresca.png}" alt="Comida saludable" class="img-fluid section-img">
+            </div>
+          </div>
+        </section>
+        <section class="container py-5">
+          <div class="row g-4">
+
+            <div class="col-lg-6">
+              <div class="bg-light p-4 d-flex align-items-center justify-content-between h-100 rounded">
+                <div>
+                  <h4 class="fw-bold text-success">Recomendación del día</h4>
+                  <h5 class="fw-semibold text-dark">Buddha Bowl con garbanzos, aguacate y quinoa</h5>
+                  <p class="mb-3 text-muted small">Energía balanceada con ingredientes frescos</p>
+                  <a th:href="@{/carta}" class="btn btn-success rounded-pill px-4 py-2">Ordenar Ahora →</a>
+                </div>
+                <img th:src="@{/Imagenes/bowl-de-garbanzos-y-quinua_version_1652869666.jpg}" alt="Buddha Bowl" style="max-height: 160px; object-fit: contain;" class="img-fluid ms-3">
+              </div>
+            </div>
+
+            <div class="col-lg-6 d-flex flex-column gap-4">
+              
+              <div class="bg-light p-4 d-flex align-items-center justify-content-between rounded">
+                <div>
+                  <h6 class="fw-bold mb-1">Tostadas integrales con hummus</h6>
+                  <p class="text-muted mb-0 small">Una entrada ligera y nutritiva</p>
+                  <p class="text-success mb-0 small">Desde <strong>$3.50</strong></p>
+                </div>
+                <img th:src="@{/Imagenes/tosadas.jpg}" alt="Entrada saludable" style="max-height: 80px; object-fit: contain;" class="img-fluid">
+              </div>
+
+              <div class="bg-light p-4 d-flex align-items-center justify-content-between rounded">
+                <div>
+                  <h6 class="fw-bold mb-2">Jugo Detox de pepino y manzana</h6>
+                  <p class="text-muted mb-2 small">Refrescante y revitalizante</p>
+                  <a th:href="@{/carta}" class="btn btn-success btn-sm rounded-pill px-3">Pide el tuyo →</a>
+                </div>
+                <img th:src="@{/Imagenes/BATIDO-DETOX-DE-ESPINACAS-PEPINO-MANZANA.jpg}" alt="Jugo Detox" style="max-height: 80px; object-fit: contain;" class="img-fluid">
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="py-5 bg-light">
+          <div class="container">
+            <div class="text-center mb-5">
+              <p class="text-success fw-bold mb-1">TESTIMONIOS</p>
+              <h2 class="fw-bold">Lo que nuestros clientes dicen</h2>
+              <p class="text-muted">Experiencias reales con la frescura y sabor de Marea</p>
+            </div>
+
+            <div class="row g-4">
+              
+              <div class="col-md-4">
+                <div class="bg-white p-4 shadow-sm rounded h-100 d-flex flex-column">
+                  <div class="d-flex align-items-center mb-3">
+                    <img th:src="@{/Imagenes/nutricionista.png}" alt="Cliente feliz" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                    <div class="ms-3">
+                      <h6 class="mb-0 fw-bold">Ana Gutiérrez</h6>
+                      <small class="text-success">Nutricionista</small>
+                    </div>
+                  </div>
+                  <p class="text-muted mb-0">"Los productos de Marea son siempre frescos. Me encanta recomendar sus opciones saludables a mis pacientes."</p>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="bg-white p-4 shadow-sm rounded h-100 d-flex flex-column">
+                  <div class="d-flex align-items-center mb-3">
+                    <img th:src="@{/Imagenes/persona_feliz.png}" alt="Cliente feliz" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                    <div class="ms-3">
+                      <h6 class="mb-0 fw-bold">Carlos Mendoza</h6>
+                      <small class="text-success">Cliente frecuente</small>
+                    </div>
+                  </div>
+                  <p class="text-muted mb-0">"Hago mi pedido cada semana. Todo llega rápido, bien empacado y súper fresco. ¡Excelente servicio!"</p>
+                </div>
+              </div>
+
+              <div class="col-md-4">
+                <div class="bg-white p-4 shadow-sm rounded h-100 d-flex flex-column">
+                  <div class="d-flex align-items-center mb-3">
+                    <img th:src="@{/Imagenes/chef.jpg}" alt="Cliente feliz" class="rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                    <div class="ms-3">
+                      <h6 class="mb-0 fw-bold">Laura Fernández</h6>
+                      <small class="text-success">Chef vegana</small>
+                    </div>
+                  </div>
+                  <p class="text-muted mb-0">"Recomiendo Marea a mis pacientes, es el mejor aliado en tu alimentacion."</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <section class="container py-5">
+          <div class="row align-items-center">
+            <div class="col-md-6 text-center">
+              <img th:src="@{/Imagenes/229338880_10998922.png}" class="img-fluid section-img rounded" alt="Lechuga fresca">
+            </div>
+            <div class="col-md-6">
+              <h2 class="fw-bold text-success">Frescura a tu mesa</h2>
+              <p>En Marea llevamos alimentos frescos y saludables directamente a tu hogar. Nuestro compromiso es con la calidad y el bienestar de tu familia.</p>
+              <a th:href="@{/nosotros}" class="btn btn-success">Conócenos</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="container py-5 bg-light">
+          <div class="row align-items-center flex-md-row-reverse">
+            <div class="col-md-6 text-center">
+              <img th:src="@{/Imagenes/cesta-llena-de-verduras.jpg}" class="img-fluid section-img rounded" alt="Frutas frescas">
+            </div>
+            <div class="col-md-6">
+              <h2 class="fw-bold text-success">Variedad que te acompaña</h2>
+              <p>Ofrecemos una amplia gama de frutas y verduras frescas, cultivadas con dedicación. Siempre tendrás opciones saludables en tu mesa.</p>
+              <a th:href="@{/carta}" class="btn btn-outline-success">Ver productos</a>
+            </div>
+          </div>
+        </section>
+
+        <section class="container py-5">
+          <div class="row align-items-center">
+            <div class="col-md-6 text-center">
+              <img th:src="@{/Imagenes/hombre-de-entrega-de-pizza-escuchar-algo.jpg}" class="img-fluid section-img rounded" alt="Delivery">
+            </div>
+            <div class="col-md-6">
+              <h2 class="fw-bold text-success">Entrega rápida y segura</h2>
+              <p>Nuestro sistema de distribución garantiza que tus pedidos lleguen frescos y en el menor tiempo posible. Cuidamos cada detalle del proceso.</p>
+              <a th:href="@{/carta}" class="btn btn-success">Haz tu pedido</a>
+            </div>
+          </div>
+        </section>
+        <footer class="bg-success text-white text-center p-3">
+          <p class="mb-0">© 2025 Marea - Todos los derechos reservados</p>
+        </footer>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

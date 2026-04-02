@@ -1,0 +1,22 @@
+body {
+      background-color: #f8fdf8;
+    }
+
+    h1 span.text-success {
+      color: #28a745;
+    }
+
+    .hero img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .section-img {
+      max-width: 75%;
+    }
+
+    @media (max-width: 768px) {
+      .section-img {
+        max-width: 100%;
+      }
+    }

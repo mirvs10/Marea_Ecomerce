@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Admin - Marea Fit</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+        <nav class="navbar navbar-dark bg-success sticky-top">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <i class="fas fa-leaf"></i> Marea Fit - Admin
+                </a>
+                <div class="d-flex align-items-center text-white">
+                    <span class="me-3">
+                        <i class="fas fa-user-shield"></i> 
+                        <span th:text="${session.usuarioLogueado?.nombre}">Admin</span>
+                    </span>
+                    <a th:href="@{/}" class="btn btn-outline-light btn-sm me-2">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                    <a th:href="@{/logout}" class="btn btn-outline-light btn-sm">
+                        <i class="fas fa-sign-out-alt"></i> Salir
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid">
+            <div class="row">
+                
+                <nav class="col-md-2 col-lg-2 d-md-block bg-light sidebar">
+                    <div class="position-sticky pt-3">
+                        <ul class="nav flex-column">
+                            
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#" data-section="usuarios">
+                                    <i class="fas fa-users"></i> Usuarios
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="pedidos">
+                                    <i class="fas fa-shopping-cart"></i> Pedidos
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="productos">
+                                    <i class="fas fa-box"></i> Productos
+                                </a>
+                            </li>
+                            
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" data-section="reportes">
+                                    <i class="fas fa-chart-line"></i> Reportes
+                                </a>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                </nav>
+
+                <main class="col-md-10 ms-sm-auto col-lg-10 px-md-4">
+                    
+                    <div id="section-usuarios" class="content-section">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-users text-success"></i> Gestión de Usuarios</h1>
+                        </div>
+
+                        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                            <span th:text="${error}"></span>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+
+                        <div class="card mb-4 shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h5 id="form-title-usuarios" class="mb-0">➕ Agregar Nuevo Usuario</h5>
+                            </div>
+                            <div class="card-body">
+                                <form id="usuario-form" th:action="@{/admin/guardar-nuevo}" method="post">
+                                    <input type="hidden" id="usuario-id" name="id" />
+                                    
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3">
+                                            <label for="nombre" class="form-label">Nombre Completo *</label>
+                                            <input type="text" class="form-control" id="nombre" name="nombre" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="correo" class="form-label">Correo *</label>
+                                            <input type="email" class="form-control" id="correo" name="correo" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="telefono" class="form-label">Teléfono</label>
+                                            <input type="tel" class="form-control" id="telefono" name="telefono" />
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-md-4 mb-3" id="password-group">
+                                            <label for="contraseña" class="form-label">Contraseña *</label>
+                                            <input type="password" class="form-control" id="contraseña" name="contraseña" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3" id="confirm-password-group">
+                                            <label for="confirmarPassword" class="form-label">Confirmar *</label>
+                                            <input type="password" class="form-control" id="confirmarPassword" name="confirmarPassword" required />
+                                        </div>
+                                        <div class="col-md-4 mb-3">
+                                            <label for="tipoUsuario" class="form-label">Tipo *</label>
+                                            <select class="form-select" id="tipoUsuario" name="tipoUsuario" required>
+                                                <option value="">Selecciona</option>
+                                                <option value="admin">Admin</option>
+                                                <option value="cliente">Cliente</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="btn btn-success" id="submit-btn-usuarios">
+                                        <i class="fas fa-save"></i> Guardar
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="resetFormularioUsuarios()">
+                                        <i class="fas fa-times"></i> Cancelar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">
+                                    Lista de Usuarios 
+                                    <span class="badge bg-light text-success" th:text="${usuarios?.size() ?: 0}">0</span>
+                                </h5>
+                            </div>
+                            <div class="card-body p-0" th:if="${usuarios != null and !usuarios.isEmpty()}">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-success">
+                                            <tr>
+                                                <th>ID</th>
+                                                <th>Nombre</th>
+                                                <th>Correo</th>
+                                                <th>Teléfono</th>
+                                                <th>Rol</th>
+                                                <th>Fecha</th>
+                                                <th class="text-center">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr th:each="usuario : ${usuarios}">
+                                                <td th:text="${usuario.idUsuario}">1</td>
+                                                <td th:text="${usuario.nombre}">Nombre</td>
+                                                <td th:text="${usuario.correo}">correo@test.com</td>
+                                                <td th:text="${usuario.telefono}">987654321</td>
+                                                <td>
+                                                    <span class="badge" 
+                                                        th:classappend="${usuario.rol.name() == 'ADMIN' ? 'bg-danger' : 'bg-primary'}"
+                                                        th:text="${usuario.rol}">CLIENTE</span>
+                                                </td>
+                                                <td th:text="${#temporals.format(usuario.fechaRegistro, 'dd/MM/yyyy')}">01/01/2025</td>
+                                                <td class="text-center">
+                                                    <button class="btn btn-warning btn-sm editar-btn-usuario"
+                                                            th:data-id="${usuario.idUsuario}"
+                                                            th:data-nombre="${usuario.nombre}"
+                                                            th:data-correo="${usuario.correo}"
+                                                            th:data-telefono="${usuario.telefono}"
+                                                            th:data-rol="${usuario.rol}">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <a th:href="@{'/admin/eliminar/' + ${usuario.idUsuario}}"
+                                                    class="btn btn-danger btn-sm"
+                                                    onclick="return confirm('¿Eliminar usuario?');">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card-body text-center py-5" th:if="${usuarios == null or usuarios.isEmpty()}">
+                                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                <h5 class="text-muted">No hay usuarios registrados</h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="section-pedidos" class="content-section" style="display:none;">
+                                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                                    <h1 class="h2">
+                                        <i class="fas fa-shopping-cart text-success"></i> Gestión de Pedidos
+                                    </h1>
+                                </div>
+
+                                <div th:if="${param.success}" class="alert alert-success alert-dismissible fade show">
+                                    <i class="fas fa-check-circle"></i> <span th:text="${param.success}"></span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+                                
+                                <div th:if="${param.error}" class="alert alert-danger alert-dismissible fade show">
+                                    <i class="fas fa-exclamation-triangle"></i> <span th:text="${param.error}"></span>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                </div>
+
+                                <div class="row mb-4">
+                                    <div class="col-md-3">
+                                        <div class="card border-warning">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-clock fa-2x text-warning mb-2"></i>
+                                                <h3 class="mb-0" th:text="${pedidosPendientes != null ? pedidosPendientes.size() : 0}">0</h3>
+                                                <small class="text-muted">Pendientes</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-info">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-shipping-fast fa-2x text-info mb-2"></i>
+                                                <h3 class="mb-0" th:text="${pedidosEnviados != null ? pedidosEnviados.size() : 0}">0</h3>
+                                                <small class="text-muted">Enviados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-success">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-check-circle fa-2x text-success mb-2"></i>
+                                                <h3 class="mb-0" th:text="${pedidosEntregados != null ? pedidosEntregados.size() : 0}">0</h3>
+                                                <small class="text-muted">Entregados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="card border-danger">
+                                            <div class="card-body text-center">
+                                                <i class="fas fa-times-circle fa-2x text-danger mb-2"></i>
+                                                <h3 class="mb-0" th:text="${pedidosCancelados != null ? pedidosCancelados.size() : 0}">0</h3>
+                                                <small class="text-muted">Cancelados</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card mb-4 shadow-sm">
+                                    <div class="card-body">
+                                        <div class="row align-items-end">
+                                            <div class="col-md-4">
+                                                <label class="form-label">
+                                                    <i class="fas fa-filter"></i> Filtrar por Estado
+                                                </label>
+                                                <select class="form-select" id="filtro-estado-pedido" onchange="filtrarPedidosPorEstado()">
+                                                    <option value="">Todos los estados</option>
+                                                    <option value="PENDIENTE">Pendientes</option>
+                                                    <option value="ENVIADO">Enviados</option>
+                                                    <option value="ENTREGADO">Entregados</option>
+                                                    <option value="CANCELADO">Cancelados</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-8 text-end">
+                                                <button class="btn btn-outline-secondary btn-sm" onclick="limpiarFiltroPedidos()">
+                                                    <i class="fas fa-undo"></i> Limpiar filtro
+                                                </button>
+                                                <button class="btn btn-outline-primary btn-sm" onclick="location.reload()">
+                                                    <i class="fas fa-sync"></i> Actualizar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-list"></i> Lista de Pedidos 
+                                            <span class="badge bg-light text-success" th:text="${pedidos?.size() ?: 0}">0</span>
+                                        </h5>
+                                    </div>
+                                    
+                                    <div class="card-body p-0" th:if="${pedidos != null and !pedidos.isEmpty()}">
+                                        <div class="table-responsive">
+                                            <table class="table table-hover mb-0">
+                                                <thead class="table-success">
+                                                    <tr>
+                                                        <th width="8%">ID</th>
+                                                        <th width="15%">Cliente</th>
+                                                        <th width="15%">Fecha</th>
+                                                        <th width="12%">Total</th>
+                                                        <th width="12%">Estado</th>
+                                                        <th width="18%">Dirección</th>
+                                                        <th width="20%" class="text-center">Acciones</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tabla-pedidos-body">
+                                                    <tr th:each="pedido : ${pedidos}" 
+                                                        th:data-estado="${pedido.estado}"
+                                                        class="fila-pedido">
+                                                        <td>
+                                                            <strong>#<span th:text="${pedido.idPedido}">1</span></strong>
+                                                        </td>
+                                                        <td>
+                                                            <i class="fas fa-user text-muted"></i>
+                                                            <span th:text="${pedido.usuario.nombre}">Cliente</span>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${pedido.usuario.correo}">correo@test.com</small>
+                                                        </td>
+                                                        <td>
+                                                            <small th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy')}">01/01/2025</small>
+                                                            <br>
+                                                            <small class="text-muted" th:text="${#temporals.format(pedido.fechaPedido, 'HH:mm')}">10:30</small>
+                                                        </td>
+                                                        <td>
+                                                            <strong class="text-success">
+                                                                S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span>
+                                                            </strong>
+                                                        </td>
+                                                        <td>
+                                                            <span th:if="${pedido.estado.name() == 'PENDIENTE'}" 
+                                                                class="badge bg-warning text-dark">
+                                                                <i class="fas fa-clock"></i> Pendiente
+                                                            </span>
+                                                            <span th:if="${pedido.estado.name() == 'ENVIADO'}" 
+                                                                class="badge bg-info text-white">
+                                                                <i class="fas fa-shipping-fast"></i> Enviado
+                                                            </span>
+                                                            <span th:if="${pedido.estado.name() == 'ENTREGADO'}" 
+                                                                class="badge bg-success">
+                                                                <i class="fas fa-check-circle"></i> Entregado
+                                                            </span>
+                                                            <span th:if="${pedido.estado.name() == 'CANCELADO'}" 
+                                                                class="badge bg-danger">
+                                                                <i class="fas fa-times-circle"></i> Cancelado
+                                                            </span>
+                                                        </td>
+                                                        <td>
+                                                            <small th:if="${pedido.direccion != null}">
+                                                                <i class="fas fa-map-marker-alt text-danger"></i>
+                                                                <span th:text="${pedido.direccion.distrito}">Distrito</span>
+                                                            </small>
+                                                            <small th:unless="${pedido.direccion != null}" class="text-muted">
+                                                                Sin dirección
+                                                            </small>
+                                                        </td>
+                                                        <td class="text-center">
+                                                            <button class="btn btn-info btn-sm me-1" 
+                                                                    data-bs-toggle="modal" 
+                                                                    th:data-bs-target="'#modalDetalle' + ${pedido.idPedido}">
+                                                                <i class="fas fa-eye"></i>
+                                                            </button>
+
+                                                            <div class="btn-group" 
+                                                                th:if="${pedido.estado.name() != 'ENTREGADO' && pedido.estado.name() != 'CANCELADO'}">
+                                                                <button type="button" 
+                                                                        class="btn btn-success btn-sm dropdown-toggle" 
+                                                                        data-bs-toggle="dropdown">
+                                                                    <i class="fas fa-edit"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu">
+                                                                    <li th:if="${pedido.estado.name() == 'PENDIENTE'}">
+                                                                        <a class="dropdown-item" 
+                                                                        th:href="@{'/admin/pedidos/cambiar-estado/' + ${pedido.idPedido} + '/ENVIADO'}">
+                                                                            <i class="fas fa-shipping-fast text-info"></i> Marcar como Enviado
+                                                                        </a>
+                                                                    </li>
+                                                                    <li th:if="${pedido.estado.name() == 'ENVIADO'}">
+                                                                        <a class="dropdown-item" 
+                                                                        th:href="@{'/admin/pedidos/cambiar-estado/' + ${pedido.idPedido} + '/ENTREGADO'}">
+                                                                            <i class="fas fa-check-circle text-success"></i> Marcar como Entregado
+                                                                        </a>
+                                                                    </li>
+                                                                </ul>
+                                                            </div>
+
+                                                            <span th:if="${pedido.estado.name() == 'ENTREGADO'}" 
+                                                                class="badge bg-success">
+                                                                <i class="fas fa-check"></i> Completado
+                                                            </span>
+                                                            <span th:if="${pedido.estado.name() == 'CANCELADO'}" 
+                                                                class="badge bg-danger">
+                                                                <i class="fas fa-ban"></i> Cancelado
+                                                            </span>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="card-body text-center py-5" th:if="${pedidos == null or pedidos.isEmpty()}">
+                                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">📋 No hay pedidos registrados</h5>
+                                        <p class="text-muted">Los pedidos de los clientes aparecerán aquí</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div th:each="pedido : ${pedidos}">
+                                <div class="modal fade" th:id="'modalDetalle' + ${pedido.idPedido}" tabindex="-1">
+                                    <div class="modal-dialog modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header bg-success text-white">
+                                                <h5 class="modal-title">
+                                                    <i class="fas fa-receipt"></i> 
+                                                    Detalle del Pedido #<span th:text="${pedido.idPedido}">1</span>
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">
+                                                            <i class="fas fa-user text-primary"></i> Información del Cliente
+                                                        </h6>
+                                                        <p class="mb-1">
+                                                            <strong>Nombre:</strong> <span th:text="${pedido.usuario.nombre}">Cliente</span>
+                                                        </p>
+                                                        <p class="mb-1">
+                                                            <strong>Correo:</strong> <span th:text="${pedido.usuario.correo}">correo@test.com</span>
+                                                        </p>
+                                                        <p class="mb-0" th:if="${pedido.usuario.telefono != null}">
+                                                            <strong>Teléfono:</strong> <span th:text="${pedido.usuario.telefono}">999999999</span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card mb-3" th:if="${pedido.direccion != null}">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">
+                                                            <i class="fas fa-map-marker-alt text-danger"></i> Dirección de Entrega
+                                                        </h6>
+                                                        <p class="mb-1" th:text="${pedido.direccion.direccion}">Dirección</p>
+                                                        <p class="mb-1" th:text="${pedido.direccion.distrito + ', ' + pedido.direccion.ciudad}">Distrito, Ciudad</p>
+                                                        <p class="mb-0" th:if="${pedido.direccion.referencia != null}">
+                                                            <small class="text-muted">Ref: <span th:text="${pedido.direccion.referencia}">Referencia</span></small>
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card mb-3">
+                                                    <div class="card-body">
+                                                        <h6 class="card-title">
+                                                            <i class="fas fa-shopping-bag text-success"></i> Productos
+                                                        </h6>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-sm">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Producto</th>
+                                                                        <th class="text-center">Cant.</th>
+                                                                        <th class="text-end">P. Unit.</th>
+                                                                        <th class="text-end">Subtotal</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr th:each="detalle : ${pedido.detalles}">
+                                                                        <td th:text="${detalle.producto.nombre}">Producto</td>
+                                                                        <td class="text-center" th:text="${detalle.cantidad}">1</td>
+                                                                        <td class="text-end">
+                                                                            S/ <span th:text="${#numbers.formatDecimal(detalle.precioUnitario, 1, 2)}">0.00</span>
+                                                                        </td>
+                                                                        <td class="text-end">
+                                                                            <strong>S/ <span th:text="${#numbers.formatDecimal(detalle.cantidad * detalle.precioUnitario, 1, 2)}">0.00</span></strong>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                                <tfoot>
+                                                                    <tr>
+                                                                        <td colspan="3" class="text-end"><strong>TOTAL:</strong></td>
+                                                                        <td class="text-end">
+                                                                            <h5 class="text-success mb-0">
+                                                                                S/ <span th:text="${#numbers.formatDecimal(pedido.total, 1, 2)}">0.00</span>
+                                                                            </h5>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tfoot>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="alert alert-info mb-0">
+                                                    <strong>Estado actual:</strong>
+                                                    <span th:text="${pedido.estado}">PENDIENTE</span>
+                                                    <br>
+                                                    <small>Fecha del pedido: <span th:text="${#temporals.format(pedido.fechaPedido, 'dd/MM/yyyy HH:mm')}">01/01/2025 10:30</span></small>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <script>
+                            function filtrarPedidosPorEstado() {
+                                const estadoSeleccionado = document.getElementById('filtro-estado-pedido').value;
+                                const filas = document.querySelectorAll('.fila-pedido');
+                                
+                                filas.forEach(fila => {
+                                    if (estadoSeleccionado === '' || fila.dataset.estado === estadoSeleccionado) {
+                                        fila.style.display = '';
+                                    } else {
+                                        fila.style.display = 'none';
+                                    }
+                                });
+                            }
+
+                            function limpiarFiltroPedidos() {
+                                document.getElementById('filtro-estado-pedido').value = '';
+                                filtrarPedidosPorEstado();
+                            }
+                            </script>
+
+
+
+    <div id="section-productos" class="content-section" style="display:none;">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+            <h1 class="h2"><i class="fas fa-box text-success"></i> Gestión de Productos y Categorías</h1>
+        </div>
+
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <ul class="nav nav-tabs mb-4" id="productosTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="categorias-tab" data-bs-toggle="tab" data-bs-target="#categorias-content" type="button">
+                    <i class="fas fa-tags"></i> Categorías
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="productos-tab" data-bs-toggle="tab" data-bs-target="#productos-content" type="button">
+                    <i class="fas fa-utensils"></i> Productos
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="productosTabContent">
+            <div class="tab-pane fade show active" id="categorias-content">
+                
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 id="form-title-categorias" class="mb-0">
+                            <i class="fas fa-plus-circle"></i> Agregar Nueva Categoría
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="categoria-form" th:action="@{/admin/categorias/guardar}" method="post">
+                            <input type="hidden" id="categoria-id" name="idCategoria" />
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="categoria-nombre" class="form-label">Nombre de la Categoría *</label>
+                                    <input type="text" 
+                                        class="form-control" 
+                                        id="categoria-nombre" 
+                                        name="nombre" 
+                                        placeholder="Ej: Ensaladas, Jugos, Postres" 
+                                        required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="categoria-descripcion" class="form-label">Descripción</label>
+                                    <input type="text" 
+                                        class="form-control" 
+                                        id="categoria-descripcion" 
+                                        name="descripcion" 
+                                        placeholder="Breve descripción de la categoría" />
+                                </div>
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <button type="submit" class="btn btn-success" id="submit-btn-categorias">
+                                    <i class="fas fa-save"></i> Guardar Categoría
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="resetFormularioCategorias()">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list"></i> Lista de Categorías 
+                            <span class="badge bg-light text-success" th:text="${categorias?.size() ?: 0}">0</span>
+                        </h5>
+                    </div>
+                    
+                    <div class="card-body p-0" th:if="${categorias != null and !categorias.isEmpty()}">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th width="10%">ID</th>
+                                        <th width="30%">Nombre</th>
+                                        <th width="40%">Descripción</th>
+                                        <th width="20%" class="text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cat : ${categorias}">
+                                        <td th:text="${cat.idCategoria}">1</td>
+                                        <td>
+                                            <strong th:text="${cat.nombre}">Nombre</strong>
+                                            <span class="badge bg-info text-white ms-2" 
+                                                th:if="${cat.cantidadProductos != null and cat.cantidadProductos > 0}"
+                                                th:text="${cat.cantidadProductos + ' productos'}">
+                                                0 productos
+                                            </span>
+                                        </td>
+                                        <td th:text="${cat.descripcion}">Descripción</td>
+                                        <td class="text-center">
+                                            <button class="btn btn-warning btn-sm editar-btn-categoria me-1"
+                                                    th:data-id="${cat.idCategoria}"
+                                                    th:data-nombre="${cat.nombre}"
+                                                    th:data-descripcion="${cat.descripcion}">
+                                                <i class="fas fa-edit"></i> Editar
+                                            </button>
+                                            <a th:href="@{'/admin/categorias/eliminar/' + ${cat.idCategoria}}"
+                                            class="btn btn-danger btn-sm eliminar-btn-categoria"
+                                            th:data-nombre="${cat.nombre}"
+                                            onclick="return confirm('¿Estás seguro de eliminar esta categoría?\n\nNota: Si tiene productos asociados, también se eliminarán.');">
+                                                <i class="fas fa-trash"></i> Eliminar
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body text-center py-5" th:if="${categorias == null or categorias.isEmpty()}">
+                        <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">📋 No hay categorías registradas</h5>
+                        <p class="text-muted">Crea tu primera categoría para comenzar a organizar tus productos</p>
+                    </div>
+                </div>
+            </div>
+
+    <div class="tab-pane fade" id="productos-content">
+        
+        <div class="card mb-4 shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 id="form-title-productos" class="mb-0">
+                    <i class="fas fa-plus-circle"></i> Agregar Nuevo Producto
+                </h5>
+            </div>
+            <div class="card-body">
+                <form id="producto-form" th:action="@{/admin/productos/guardar}" method="post">
+                    <input type="hidden" id="producto-id" name="idProducto" />
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="producto-nombre" class="form-label">Nombre del Producto *</label>
+                            <input type="text" 
+                                class="form-control" 
+                                id="producto-nombre" 
+                                name="nombre" 
+                                placeholder="Ej: Ensalada César" 
+                                required />
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="producto-precio" class="form-label">Precio (S/) *</label>
+                            <input type="number" 
+                                class="form-control" 
+                                id="producto-precio" 
+                                name="precio" 
+                                step="0.01" 
+                                min="0" 
+                                placeholder="15.50" 
+                                required />
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label for="producto-disponible" class="form-label">Estado</label>
+                            <select class="form-select" id="producto-disponible" name="disponible">
+                                <option value="true" selected>Disponible</option>
+                                <option value="false">No disponible</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="producto-categoria" class="form-label">Categoría *</label>
+                            <select class="form-select" 
+                                    id="producto-categoria" 
+                                    name="idCategoria" 
+                                    required>
+                                <option value="">Selecciona una categoría</option>
+                                <option th:each="cat : ${categorias}" 
+                                        th:value="${cat.idCategoria}" 
+                                        th:text="${cat.nombre}">
+                                    Categoría
+                                </option>
+                            </select>
+                            <div class="form-text">
+                                <i class="fas fa-info-circle"></i> 
+                                Si no hay categorías, <a href="#" onclick="activarTabCategorias()">créalas primero aquí</a>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="producto-imagen" class="form-label">URL de Imagen</label>
+                            <input type="text" 
+                                class="form-control" 
+                                id="producto-imagen" 
+                                name="imagenUrl" 
+                                placeholder="/img/producto.jpg" />
+                            <div class="form-text">
+                                <i class="fas fa-image"></i> 
+                                URL o ruta de la imagen del producto
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label for="producto-descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" 
+                                    id="producto-descripcion" 
+                                    name="descripcion" 
+                                    rows="3" 
+                                    placeholder="Descripción detallada del producto"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success" id="submit-btn-productos">
+                            <i class="fas fa-save"></i> Guardar Producto
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="resetFormularioProductos()">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mb-3 shadow-sm">
+            <div class="card-body">
+                <div class="row align-items-end">
+                    <div class="col-md-4">
+                        <label for="filtro-categoria" class="form-label">
+                            <i class="fas fa-filter"></i> Filtrar por Categoría
+                        </label>
+                        <select class="form-select" id="filtro-categoria" onchange="filtrarProductosPorCategoria()">
+                            <option value="">Todas las categorías</option>
+                            <option th:each="cat : ${categorias}" 
+                                    th:value="${cat.idCategoria}" 
+                                    th:text="${cat.nombre}">
+                                Categoría
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-8 text-end">
+                        <button class="btn btn-outline-secondary btn-sm" onclick="limpiarFiltro()">
+                            <i class="fas fa-undo"></i> Limpiar filtro
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-list"></i> Lista de Productos 
+                    <span class="badge bg-light text-success" th:text="${productos?.size() ?: 0}">0</span>
+                </h5>
+            </div>
+            
+            <div class="card-body p-0" th:if="${productos != null and !productos.isEmpty()}">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-success">
+                            <tr>
+                                <th width="5%">ID</th>
+                                <th width="20%">Producto</th>
+                                <th width="15%">Categoría</th>
+                                <th width="25%">Descripción</th>
+                                <th width="10%">Precio</th>
+                                <th width="10%">Estado</th>
+                                <th width="15%" class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos-body">
+                            <tr th:each="prod : ${productos}" 
+                                th:data-categoria="${prod.idCategoria}"
+                                class="fila-producto">
+                                <td th:text="${prod.idProducto}">1</td>
+                                <td>
+                                    <strong th:text="${prod.nombreProducto}">Nombre</strong>
+                                    <br>
+                                    <small class="text-muted" th:if="${prod.imagenUrl != null and !prod.imagenUrl.isEmpty()}">
+                                        <i class="fas fa-image"></i> Con imagen
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info text-white" 
+                                        th:text="${prod.nombreCategoria}">
+                                        Categoría
+                                    </span>
+                                </td>
+                                <td>
+                                    <small th:text="${prod.descripcionProducto ?: 'Sin descripción'}">
+                                        Descripción
+                                    </small>
+                                </td>
+                                <td>
+                                    <strong class="text-success">
+                                        S/ <span th:text="${#numbers.formatDecimal(prod.precio, 1, 2)}">0.00</span>
+                                    </strong>
+                                </td>
+                                <td>
+                                    <span th:if="${prod.disponible}" 
+                                        class="badge bg-success">
+                                        <i class="fas fa-check-circle"></i> Disponible
+                                    </span>
+                                    <span th:unless="${prod.disponible}" 
+                                        class="badge bg-danger">
+                                        <i class="fas fa-times-circle"></i> No disponible
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <button class="btn btn-warning btn-sm editar-btn-producto me-1"
+                                            th:data-id="${prod.idProducto}"
+                                            th:data-nombre="${prod.nombreProducto}"
+                                            th:data-descripcion="${prod.descripcionProducto}"
+                                            th:data-precio="${prod.precio}"
+                                            th:data-imagen="${prod.imagenUrl}"
+                                            th:data-disponible="${prod.disponible}"
+                                            th:data-categoria="${prod.idCategoria}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <a th:href="@{'/admin/productos/eliminar/' + ${prod.idProducto}}"
+                                    class="btn btn-danger btn-sm eliminar-btn-producto"
+                                    th:data-nombre="${prod.nombreProducto}"
+                                    onclick="return confirm('¿Estás seguro de eliminar este producto?');">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card-body text-center py-5" th:if="${productos == null or productos.isEmpty()}">
+                <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">📋 No hay productos registrados</h5>
+                <p class="text-muted">Agrega tu primer producto usando el formulario de arriba</p>
+                <p class="text-muted">
+                    <i class="fas fa-lightbulb text-warning"></i> 
+                    <strong>Tip:</strong> Primero crea categorías en la pestaña anterior
+                </p>
+            </div>
+        </div>
+    </div>
+
+                    <div id="section-reportes" class="content-section" style="display:none;">
+                        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                            <h1 class="h2"><i class="fas fa-chart-line text-success"></i> Reportes y Estadísticas</h1>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-users fa-2x text-primary mb-2"></i>
+                                        <h3 th:text="${usuarios?.size() ?: 0}">0</h3>
+                                        <p class="text-muted mb-0">Usuarios</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-shopping-cart fa-2x text-success mb-2"></i>
+                                        <h3>0</h3>
+                                        <p class="text-muted mb-0">Pedidos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-box fa-2x text-warning mb-2"></i>
+                                        <h3>0</h3>
+                                        <p class="text-muted mb-0">Productos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card text-center">
+                                    <div class="card-body">
+                                        <i class="fas fa-dollar-sign fa-2x text-danger mb-2"></i>
+                                        <h3>S/ 0</h3>
+                                        <p class="text-muted mb-0">Ventas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-success text-white">
+                                <h5 class="mb-0">Actividad Mensual</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="actividadChart" height="80"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+            </div>
+        </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>
