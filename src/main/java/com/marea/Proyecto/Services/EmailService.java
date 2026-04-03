@@ -18,7 +18,7 @@ public class EmailService {
     @Value("${sendgrid.api.key}")
     private String apiKey;
 
-    @Value("${correo.remitente}")
+    @Value("${sendgrid.from.email}")
     private String remitente;
 
     public void enviarCorreoConfirmacion(String destinatario, String asunto, String contenidoHtml) throws IOException {
